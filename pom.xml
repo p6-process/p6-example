@@ -1,0 +1,70 @@
+<?xml version="1.0"?>
+<project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd"
+         xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+
+    <parent>
+        <groupId>org.lorislab.p6</groupId>
+        <artifactId>p6-parent</artifactId>
+        <version>0.13.2</version>
+    </parent>
+
+    <modelVersion>4.0.0</modelVersion>
+    <artifactId>p6-example</artifactId>
+    <version>999-SNAPSHOT</version>
+
+    <dependencies>
+        <dependency>
+            <groupId>org.lorislab.quarkus</groupId>
+            <artifactId>jel-quarkus-log</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>io.quarkus</groupId>
+            <artifactId>quarkus-resteasy</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>io.quarkus</groupId>
+            <artifactId>quarkus-resteasy-jsonb</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>io.quarkus</groupId>
+            <artifactId>quarkus-smallrye-openapi</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <scope>provided</scope>
+        </dependency>
+
+        <!-- TEST -->
+        <dependency>
+            <groupId>org.testcontainers</groupId>
+            <artifactId>junit-jupiter</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>io.quarkus</groupId>
+            <artifactId>quarkus-junit5</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>io.rest-assured</groupId>
+            <artifactId>rest-assured</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.lorislab.quarkus</groupId>
+            <artifactId>jel-quarkus-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+
+    <repositories>
+        <repository>
+            <id>lorislab-git-repo</id>
+            <name>Lorislab git repository</name>
+            <url>https://gitlab.com/lorislab/maven/repo/raw/master</url>
+        </repository>
+    </repositories>
+
+</project>
