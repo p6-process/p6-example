@@ -37,16 +37,43 @@ public class SimpleProcessRestController {
 
     @POST
     @Path("service1")
-    public Response service1(Service1Pameter data) {
+    public Response service1(ServicePameter data) {
         log.info("Execute service1 method of the simple process version 1. Input parameter: {}", data);
         data.setCount(100L);
-        data.setKey(data.getKey() + "/server1");
+        data.setKey(data.getKey() + "/service1");
+        return Response.ok(data).build();
+    }
+
+    @POST
+    @Path("service2")
+    public Response service2(ServicePameter data) {
+        log.info("Execute service2 method of the simple process version 1. Input parameter: {}", data);
+        data.setCount(data.getCount() + 10L);
+        data.setKey(data.getKey() + "/service2");
+        return Response.ok(data).build();
+    }
+
+    @POST
+    @Path("service3")
+    public Response service3(ServicePameter data) {
+        log.info("Execute service3 method of the simple process version 1. Input parameter: {}", data);
+        data.setCount(data.getCount() + 10L);
+        data.setKey(data.getKey() + "/service3");
+        return Response.ok(data).build();
+    }
+
+    @POST
+    @Path("service4")
+    public Response service4(ServicePameter data) {
+        log.info("Execute service4 method of the simple process version 1. Input parameter: {}", data);
+        data.setCount(data.getCount() + 10L);
+        data.setKey(data.getKey() + "/service4");
         return Response.ok(data).build();
     }
 
     @Data
     @ToString
-    public static class Service1Pameter {
+    public static class ServicePameter {
 
         private String key;
 

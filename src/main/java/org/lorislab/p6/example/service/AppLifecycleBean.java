@@ -29,7 +29,6 @@ public class AppLifecycleBean {
 
     void onStart(@Observes StartupEvent ev) {
         log.info("The application is starting...");
-//        throw new RuntimeException("Error start the application");
     }
 
     void onStop(@Observes ShutdownEvent ev) {
