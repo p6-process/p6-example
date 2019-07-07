@@ -19,16 +19,62 @@ package org.lorislab.p6.example.service;
 import io.quarkus.runtime.ShutdownEvent;
 import io.quarkus.runtime.StartupEvent;
 import lombok.extern.slf4j.Slf4j;
+import org.eclipse.microprofile.config.inject.ConfigProperty;
+import org.eclipse.microprofile.rest.client.inject.RestClient;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.event.Observes;
+import javax.inject.Inject;
+import javax.ws.rs.core.Response;
+import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 @Slf4j
 @ApplicationScoped
 public class AppLifecycleBean {
 
+    @ConfigProperty(name = "DEPLOY_PROCESS", defaultValue = "true")
+    private Boolean deployProcess;
+
+    @Inject
+    @RestClient
+    private DeploymentProcessClient deploymentProcessClient;
+
     void onStart(@Observes StartupEvent ev) {
         log.info("The application is starting...");
+        if (deployProcess) {
+            log.info("Start deploy processes");
+            deployProcess("/p6/DummyProcess.json");
+            deployProcess("/p6/SimpleProcess.json");
+        }
+    }
+
+    private void deployProcess(String resource) {
+        log.info("Deployment of process resource {} started.", resource);
+        String content = loadResource(resource);
+        Response response = deploymentProcessClient.deploy(content);
+        if (response.getStatusInfo().getFamily() == Response.Status.Family.SUCCESSFUL) {
+            DeploymentProcessClient.DeloypmentResponse deploy = response.readEntity(DeploymentProcessClient.DeloypmentResponse.class);
+            log.info("Deployment of process resource {} finished. Deployment id {}", resource, deploy.getDeploymentId());
+        } else {
+            log.error("Deployment of process resource {} failed. Response code {}", resource, response.getStatus());
+            throw new RuntimeException("Error deploy the process");
+        }
+    }
+
+    private static String loadResource(String name) {
+        try {
+            URL url = AppLifecycleBean.class.getResource(name);
+            if (url != null) {
+                Path path = Paths.get(url.toURI());
+                return new String(Files.readAllBytes(path));
+            }
+        } catch (Exception ex) {
+            throw new RuntimeException(ex);
+        }
+        throw new RuntimeException("Missing resource " + name);
     }
 
     void onStop(@Observes ShutdownEvent ev) {

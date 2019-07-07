@@ -26,16 +26,68 @@
           "start"
         ],
         "to": [
-          "end"
+          "gateway1"
         ]
       }
+    },
+    {
+      "nodeType": "PARALLEL_GATEWAY",
+      "name": "gateway1",
+      "sequence": {
+        "from": [
+          "service1"
+        ],
+        "to": [
+          "service3",
+          "service4"
+        ]
+      },
+      "sequenceFlow": "DIVERGING"
+    },
+    {
+      "nodeType": "SERVICE_TASK",
+      "name": "service3",
+      "sequence": {
+        "from": [
+          "gateway1"
+        ],
+        "to": [
+          "gateway2"
+        ]
+      }
+    },
+    {
+      "nodeType": "SERVICE_TASK",
+      "name": "service4",
+      "sequence": {
+        "from": [
+          "gateway1"
+        ],
+        "to": [
+          "gateway2"
+        ]
+      }
+    },
+    {
+      "nodeType": "PARALLEL_GATEWAY",
+      "name": "gateway2",
+      "sequence": {
+        "from": [
+          "service3",
+          "service4"
+        ],
+        "to": [
+          "end"
+        ]
+      },
+      "sequenceFlow": "CONVERGING"
     },
     {
       "nodeType": "END_EVENT",
       "name": "end",
       "sequence": {
         "from": [
-          "service1"
+          "gateway2"
         ],
         "to": [
         ]

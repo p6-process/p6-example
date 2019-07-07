@@ -18,6 +18,8 @@ package org.lorislab.p6.example.rs;
 
 import io.quarkus.test.junit.QuarkusTest;
 import org.junit.jupiter.api.Test;
+import org.lorislab.p6.example.test.AbstractTest;
+import org.testcontainers.junit.jupiter.Testcontainers;
 
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -25,8 +27,9 @@ import javax.ws.rs.core.Response;
 import static io.restassured.RestAssured.given;
 import static org.hamcrest.Matchers.is;
 
+@Testcontainers
 @QuarkusTest
-public class SimpleProcessRestControllerTest {
+public class SimpleProcessRestControllerTest extends AbstractTest {
 
     public static String TEST_URL = "SimpleProcess/1.0.0/";
 
