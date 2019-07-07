@@ -26,10 +26,9 @@ import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.event.Observes;
 import javax.inject.Inject;
 import javax.ws.rs.core.Response;
-import java.net.URL;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
+import java.io.BufferedReader;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 
 @Slf4j
 @ApplicationScoped
@@ -65,16 +64,18 @@ public class AppLifecycleBean {
     }
 
     private static String loadResource(String name) {
-        try {
-            URL url = AppLifecycleBean.class.getResource(name);
-            if (url != null) {
-                Path path = Paths.get(url.toURI());
-                return new String(Files.readAllBytes(path));
+        try (InputStream in = AppLifecycleBean.class.getResourceAsStream(name);
+             BufferedReader reader = new BufferedReader(new InputStreamReader(in))) {
+
+            StringBuilder out = new StringBuilder();
+            String line;
+            while ((line = reader.readLine()) != null) {
+                out.append(line);
             }
+            return out.toString();
         } catch (Exception ex) {
             throw new RuntimeException(ex);
         }
-        throw new RuntimeException("Missing resource " + name);
     }
 
     void onStop(@Observes ShutdownEvent ev) {
