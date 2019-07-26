@@ -32,7 +32,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 @RegisterProvider(RestClientLogInterceptor.class)
-@Path("v1/deployment")
+@Path("v1/deployment/task/deploy")
 @RegisterRestClient
 @LoggerService
 @Consumes(MediaType.APPLICATION_JSON)
