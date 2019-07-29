@@ -63,7 +63,7 @@ public class AbstractTest {
         // create mock server client to configure the responses
         MOCK_SERVER_CLIENT = new MockServerClient(MOCK_SERVER_CONTAINER.getContainerIpAddress(), MOCK_SERVER_CONTAINER.getServerPort());
 
-        MOCK_SERVER_CLIENT.when(request("/v1/deployment/task/deploy").withMethod(HttpMethod.POST))
+        MOCK_SERVER_CLIENT.when(request("/v1/gateway/deployment/task/deploy").withMethod(HttpMethod.POST))
                 .respond(r -> response()
                         .withStatusCode(Response.Status.ACCEPTED.getStatusCode())
                         .withBody("{\"deploymentId\":\"1234\"}", JSON_UTF_8)
