@@ -21,6 +21,8 @@ import io.quarkus.runtime.StartupEvent;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.microprofile.config.inject.ConfigProperty;
 import org.eclipse.microprofile.rest.client.inject.RestClient;
+import org.lorislab.p6.example.client.gateway.DeploymentRestClient;
+import org.lorislab.p6.example.client.gateway.model.DeploymentResponse;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.event.Observes;
@@ -39,7 +41,7 @@ public class AppLifecycleBean {
 
     @Inject
     @RestClient
-    DeploymentProcessClient deploymentProcessClient;
+    DeploymentRestClient deploymentRestClient;
 
     void onStart(@Observes StartupEvent ev) {
         log.info("The application is starting...");
@@ -53,9 +55,9 @@ public class AppLifecycleBean {
     private void deployProcess(String resource) {
         log.info("Deployment of process resource {} started.", resource);
         String content = loadResource(resource);
-        Response response = deploymentProcessClient.deploy(content);
+        Response response = deploymentRestClient.deployment(content);
         if (response.getStatusInfo().getFamily() == Response.Status.Family.SUCCESSFUL) {
-            DeploymentProcessClient.DeloypmentResponse deploy = response.readEntity(DeploymentProcessClient.DeloypmentResponse.class);
+            DeploymentResponse deploy = response.readEntity(DeploymentResponse.class);
             log.info("Deployment of process resource {} finished. Deployment id {}", resource, deploy.getDeploymentId());
         } else {
             log.error("Deployment of process resource {} failed. Response code {}", resource, response.getStatus());

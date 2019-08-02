@@ -1,0 +1,68 @@
+---
+openapi: 3.0.1
+info:
+  title: p6-gateway
+  description: p6 gateway service
+  version: "1.0"
+servers:
+  - url: http://p6-gateway:8080/
+paths:
+  /v1/deployment:
+    post:
+      operationId: deployment
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+      responses:
+        200:
+          description: The token definition.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/DeploymentResponse'
+  /v1/process/start/{processId}/{processVersion}:
+    post:
+      operationId: startProcess
+      parameters:
+        - name: processId
+          in: path
+          description: Process id
+          required: true
+          schema:
+            type: string
+        - name: processVersion
+          in: path
+          description: Process version
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+      responses:
+        200:
+          description: The token definition.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/StartProcessResponse'
+components:
+  schemas:
+    StartProcessResponse:
+      type: object
+      properties:
+        processInstanceId:
+          type: string
+    DeploymentResponse:
+      type: object
+      properties:
+        deploymentId:
+          type: string
