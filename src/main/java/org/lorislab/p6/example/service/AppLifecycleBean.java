@@ -35,11 +35,11 @@ import java.io.InputStreamReader;
 public class AppLifecycleBean {
 
     @ConfigProperty(name = "DEPLOY_PROCESS", defaultValue = "true")
-    private Boolean deployProcess;
+    Boolean deployProcess;
 
     @Inject
     @RestClient
-    private DeploymentProcessClient deploymentProcessClient;
+    DeploymentProcessClient deploymentProcessClient;
 
     void onStart(@Observes StartupEvent ev) {
         log.info("The application is starting...");
