@@ -6,7 +6,7 @@
     <parent>
         <groupId>org.lorislab.p6</groupId>
         <artifactId>p6-parent</artifactId>
-        <version>0.13.6</version>
+        <version>0.13.10</version>
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
