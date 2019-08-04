@@ -28,9 +28,11 @@ import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.event.Observes;
 import javax.inject.Inject;
 import javax.ws.rs.core.Response;
-import java.io.BufferedReader;
-import java.io.InputStream;
-import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.DirectoryStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 @Slf4j
 @ApplicationScoped
@@ -39,6 +41,9 @@ public class AppLifecycleBean {
     @ConfigProperty(name = "DEPLOY_PROCESS", defaultValue = "true")
     Boolean deployProcess;
 
+    @ConfigProperty(name = "DIR_PROCESS", defaultValue = "p6")
+    String dirProcess;
+
     @Inject
     @RestClient
     DeploymentRestClient deploymentRestClient;
@@ -46,37 +51,24 @@ public class AppLifecycleBean {
     void onStart(@Observes StartupEvent ev) {
         log.info("The application is starting...");
         if (deployProcess) {
-            log.info("Start deploy processes");
-            deployProcess("/p6/DummyProcess.json");
-            deployProcess("/p6/SimpleProcess.json");
-        }
-    }
-
-    private void deployProcess(String resource) {
-        log.info("Deployment of process resource {} started.", resource);
-        String content = loadResource(resource);
-        Response response = deploymentRestClient.deployment(content);
-        if (response.getStatusInfo().getFamily() == Response.Status.Family.SUCCESSFUL) {
-            DeploymentResponse deploy = response.readEntity(DeploymentResponse.class);
-            log.info("Deployment of process resource {} finished. Deployment id {}", resource, deploy.getDeploymentId());
-        } else {
-            log.error("Deployment of process resource {} failed. Response code {}", resource, response.getStatus());
-            throw new RuntimeException("Error deploy the process");
-        }
-    }
-
-    private static String loadResource(String name) {
-        try (InputStream in = AppLifecycleBean.class.getResourceAsStream(name);
-             BufferedReader reader = new BufferedReader(new InputStreamReader(in))) {
-
-            StringBuilder out = new StringBuilder();
-            String line;
-            while ((line = reader.readLine()) != null) {
-                out.append(line);
+            log.info("Start deploy processes from {}", dirProcess);
+            try (DirectoryStream<Path> directoryStream = Files.newDirectoryStream(Paths.get(dirProcess), path -> path.toString().endsWith(".json"))) {
+                directoryStream.forEach(this::deployProcess);
+            } catch (Exception ex) {
+                throw new RuntimeException("Error deploy the process", ex);
             }
-            return out.toString();
+        }
+    }
+
+    private void deployProcess(Path path) {
+        try {
+            log.info("Deployment of process resource {} started.", path);
+            String content = new String(Files.readAllBytes(path), StandardCharsets.UTF_8);
+            Response response = deploymentRestClient.deployment(content);
+            DeploymentResponse deploy = response.readEntity(DeploymentResponse.class);
+            log.info("Deployment of process resource {} finished. Deployment id {}", path, deploy.getDeploymentId());
         } catch (Exception ex) {
-            throw new RuntimeException(ex);
+            throw new RuntimeException("Error deploy the process", ex);
         }
     }
 
