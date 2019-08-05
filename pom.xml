@@ -61,45 +61,38 @@
     <build>
         <plugins>
             <plugin>
-                <groupId>io.swagger.codegen.v3</groupId>
-                <artifactId>swagger-codegen-maven-plugin</artifactId>
-                <version>3.0.8</version>
+                <groupId>org.lorislab.maven</groupId>
+                <artifactId>mp-rest-client-maven-plugin</artifactId>
+                <version>0.1.0</version>
                 <executions>
                     <execution>
                         <id>p6-gateway</id>
                         <goals>
-                            <goal>generate</goal>
+                            <goal>codegen</goal>
                         </goals>
                         <configuration>
                             <inputSpec>src/main/resources/clients/p6-gateway/openapi.yaml</inputSpec>
-                            <language>org.lorislab.swagger.mp.RestClientCodegen</language>
                             <output>${project.build.directory}/generated-sources/mprestclient</output>
                             <generateSupportingFiles>false</generateSupportingFiles>
                             <apiPackage>org.lorislab.p6.example.client.gateway</apiPackage>
                             <modelPackage>org.lorislab.p6.example.client.gateway.model</modelPackage>
-                            <additionalProperties>
-                                <additionalProperty>apiSuffix=RestClient</additionalProperty>
-                                <additionalProperty>groupPrefix=v1/</additionalProperty>
-                                <additionalProperty>jackson=true</additionalProperty>
-                                <additionalProperty>jsonb=false</additionalProperty>
-                                <additionalProperty>beanParamCount=9</additionalProperty>
-                                <additionalProperty>dateLibrary=java8</additionalProperty>
-                                <additionalProperty>registerProviders=org.lorislab.quarkus.jel.log.interceptor.RestClientLogInterceptor</additionalProperty>
-                                <additionalProperty>registerExtraAnnotations=org.lorislab.quarkus.jel.log.interceptor.LoggerService</additionalProperty>
-                            </additionalProperties>
+                            <groupPrefix>v1/</groupPrefix>
+                            <registerProviders>
+                                <registerProvider>org.lorislab.quarkus.jel.log.interceptor.RestClientLogInterceptor</registerProvider>
+                            </registerProviders>
+                            <registerAnnotations>
+                                <registerAnnotation>org.lorislab.quarkus.jel.log.interceptor.LoggerService</registerAnnotation>
+                            </registerAnnotations>
+                            <registerModelAnnotations>
+                                <registerModelAnnotation>lombok.ToString</registerModelAnnotation>
+                                <registerModelAnnotation>io.quarkus.runtime.annotations.RegisterForReflection</registerModelAnnotation>
+                            </registerModelAnnotations>
                             <configOptions>
                                 <sourceFolder>p6-gateway</sourceFolder>
                             </configOptions>
                         </configuration>
                     </execution>
                 </executions>
-                <dependencies>
-                    <dependency>
-                        <groupId>org.lorislab.swagger</groupId>
-                        <artifactId>mp-rest-client-codegen</artifactId>
-                        <version>0.5.0</version>
-                    </dependency>
-                </dependencies>
             </plugin>
         </plugins>
     </build>
