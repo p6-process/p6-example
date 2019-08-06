@@ -22,7 +22,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.eclipse.microprofile.config.inject.ConfigProperty;
 import org.eclipse.microprofile.rest.client.inject.RestClient;
 import org.lorislab.p6.example.client.gateway.DeploymentRestClient;
-import org.lorislab.p6.example.client.gateway.model.DeploymentResponse;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.event.Observes;
@@ -65,8 +64,8 @@ public class AppLifecycleBean {
             log.info("Deployment of process resource {} started.", path);
             String content = new String(Files.readAllBytes(path), StandardCharsets.UTF_8);
             Response response = deploymentRestClient.deployment(content);
-            DeploymentResponse deploy = response.readEntity(DeploymentResponse.class);
-            log.info("Deployment of process resource {} finished. Deployment id {}", path, deploy.getDeploymentId());
+            String deploymentId = response.getHeaderString("Deployment-Id");
+            log.info("Deployment of process resource {} finished. Deployment id {}", path, deploymentId);
         } catch (Exception ex) {
             throw new RuntimeException("Error deploy the process", ex);
         }

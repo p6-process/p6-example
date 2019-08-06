@@ -18,12 +18,11 @@ paths:
       responses:
         200:
           description: The token definition.
-          content:
-            application/json:
+          headers:
+            Deployment-Id:
+              style: simple
               schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/DeploymentResponse'
+                type: string
   /v1/process/start/{processId}/{processVersion}:
     post:
       operationId: startProcess
@@ -48,21 +47,8 @@ paths:
       responses:
         200:
           description: The token definition.
-          content:
-            application/json:
+          headers:
+            Process-Instance-Id:
+              style: simple
               schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/StartProcessResponse'
-components:
-  schemas:
-    StartProcessResponse:
-      type: object
-      properties:
-        processInstanceId:
-          type: string
-    DeploymentResponse:
-      type: object
-      properties:
-        deploymentId:
-          type: string
+                type: string
