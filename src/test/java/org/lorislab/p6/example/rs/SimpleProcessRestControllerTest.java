@@ -36,7 +36,7 @@ public class SimpleProcessRestControllerTest extends AbstractTest {
     @Test
     public void simpleProcessTest() {
 
-        SimpleProcessRestController.ServicePameter service1 = new SimpleProcessRestController.ServicePameter();
+        SimpleProcessRestController.ServiceParameter service1 = new SimpleProcessRestController.ServiceParameter();
         service1.setCount(100L);
         service1.setKey("asd");
 
