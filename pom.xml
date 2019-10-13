@@ -6,12 +6,12 @@
     <parent>
         <groupId>org.lorislab.p6</groupId>
         <artifactId>p6-parent</artifactId>
-        <version>0.13.10</version>
+        <version>1.6.0</version>
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
     <artifactId>p6-example</artifactId>
-    <version>999-SNAPSHOT</version>
+    <version>0.1.0-SNAPSHOT</version>
 
     <dependencies>
         <dependency>
@@ -63,7 +63,6 @@
             <plugin>
                 <groupId>org.lorislab.maven</groupId>
                 <artifactId>mp-rest-client-maven-plugin</artifactId>
-                <version>0.1.0</version>
                 <executions>
                     <execution>
                         <id>p6-gateway</id>
@@ -77,6 +76,8 @@
                             <apiPackage>org.lorislab.p6.example.client.gateway</apiPackage>
                             <modelPackage>org.lorislab.p6.example.client.gateway.model</modelPackage>
                             <groupPrefix>v1/</groupPrefix>
+                            <lombokData>false</lombokData>
+                            <fieldPublic>true</fieldPublic>
                             <registerProviders>
                                 <registerProvider>org.lorislab.quarkus.jel.log.interceptor.RestClientLogInterceptor</registerProvider>
                             </registerProviders>
@@ -99,9 +100,9 @@
 
     <repositories>
         <repository>
-            <id>lorislab-git-repo</id>
-            <name>Lorislab git repository</name>
-            <url>https://gitlab.com/lorislab/maven/repo/raw/master</url>
+            <id>github</id>
+            <name>GitHub p6-process Apache Maven Packages</name>
+            <url>https://maven.pkg.github.com/p6-process/p6-parent</url>
         </repository>
     </repositories>
 
