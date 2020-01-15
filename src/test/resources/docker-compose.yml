@@ -22,7 +22,7 @@ services:
       - "test.unit=false"
       - "test.priority=101"
       - "test.image.pull=false"
-      - "test.env.QUARKUS_P6_GATEWAY/mp-rest/url=http://p6-example-mockserver:1080"
+      - "test.env.P6_GATEWAY_MP_REST_URL=http://p6-example-mockserver:1080"
     networks:
       - test
 
