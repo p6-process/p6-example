@@ -6,7 +6,7 @@
     <parent>
         <groupId>org.lorislab.p6</groupId>
         <artifactId>p6-parent</artifactId>
-        <version>1.6.0</version>
+        <version>1.18.0</version>
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
@@ -75,19 +75,19 @@
                             <generateSupportingFiles>false</generateSupportingFiles>
                             <apiPackage>org.lorislab.p6.example.client.gateway</apiPackage>
                             <modelPackage>org.lorislab.p6.example.client.gateway.model</modelPackage>
-                            <groupPrefix>v1/</groupPrefix>
-                            <lombokData>false</lombokData>
-                            <fieldPublic>true</fieldPublic>
-                            <registerProviders>
-                                <registerProvider>org.lorislab.quarkus.jel.log.interceptor.RestClientLogInterceptor</registerProvider>
-                            </registerProviders>
-                            <registerAnnotations>
-                                <registerAnnotation>org.lorislab.quarkus.jel.log.interceptor.LoggerService</registerAnnotation>
-                            </registerAnnotations>
-                            <registerModelAnnotations>
-                                <registerModelAnnotation>lombok.ToString</registerModelAnnotation>
-                                <registerModelAnnotation>io.quarkus.runtime.annotations.RegisterForReflection</registerModelAnnotation>
-                            </registerModelAnnotations>
+                            <pathPrefix>v1/</pathPrefix>
+                            <fieldGen>PUBLIC</fieldGen>
+                            <jsonLib>JSONB</jsonLib>
+                            <apiInterfaceDoc>false</apiInterfaceDoc>
+                            <annotations>
+                                <annotation>org.eclipse.microprofile.rest.client.annotation.RegisterProvider(org.lorislab.quarkus.jel.log.interceptor.RestClientLogInterceptor.class)</annotation>
+                                <annotation>org.lorislab.quarkus.jel.log.interceptor.LoggerService</annotation>
+                                <annotation>org.eclipse.microprofile.rest.client.inject.RegisterRestClient(configKey="p6-gateway")</annotation>
+                            </annotations>
+                            <modelAnnotations>
+                                <modelAnnotation>lombok.ToString</modelAnnotation>
+                                <modelAnnotation>io.quarkus.runtime.annotations.RegisterForReflection</modelAnnotation>
+                            </modelAnnotations>
                             <configOptions>
                                 <sourceFolder>p6-gateway</sourceFolder>
                             </configOptions>

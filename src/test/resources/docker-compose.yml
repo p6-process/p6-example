@@ -1,0 +1,30 @@
+version: "2"
+
+services:
+
+  p6-example-mockserver:
+    container_name: p6-example-mockserver
+    image: jamesdbloom/mockserver:mockserver-5.5.4
+    ports:
+      - "1080:1080"
+    labels:
+      - "test.property.p6-gateway/mp-rest/url=${url:p6-example-mockserver:1080}"
+      - "test.property.DIR_PROCESS=src/main/resources/p6"
+    networks:
+      - test
+
+  p6-example:
+    container_name: p6-example
+    image: quay.io/p6-process/p6-example:latest
+    ports:
+      - "8080:8080"
+    labels:
+      - "test.unit=false"
+      - "test.priority=101"
+      - "test.image.pull=false"
+      - "test.env.QUARKUS_P6_GATEWAY/mp-rest/url=http://p6-example-mockserver:1080"
+    networks:
+      - test
+
+networks:
+  test:

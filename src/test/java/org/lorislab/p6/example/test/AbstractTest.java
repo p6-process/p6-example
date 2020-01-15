@@ -16,61 +16,57 @@
 
 package org.lorislab.p6.example.test;
 
-import com.github.dockerjava.api.command.CreateContainerCmd;
-import com.github.dockerjava.api.model.ExposedPort;
-import com.github.dockerjava.api.model.PortBinding;
-import com.github.dockerjava.api.model.Ports;
-import org.junit.jupiter.api.BeforeAll;
+import io.restassured.RestAssured;
+import org.lorislab.jel.testcontainers.docker.DockerComposeService;
+import org.lorislab.jel.testcontainers.docker.DockerTestEnvironment;
 import org.mockserver.client.MockServerClient;
-import org.testcontainers.containers.MockServerContainer;
 
 import javax.ws.rs.HttpMethod;
 import javax.ws.rs.core.Response;
-import java.util.function.Consumer;
 
 import static com.google.common.net.MediaType.JSON_UTF_8;
 import static org.mockserver.model.HttpRequest.request;
 import static org.mockserver.model.HttpResponse.response;
 
-public class AbstractTest {
+public abstract class AbstractTest {
 
-    /**
-     * The mock server container.
-     */
-    private static final MockServerContainer MOCK_SERVER_CONTAINER;
+    public static DockerTestEnvironment ENVIRONMENT = new DockerTestEnvironment();
 
     /**
      * The mock server client
      */
-    private static MockServerClient MOCK_SERVER_CLIENT;
+    private static String mockServerHost;
 
-    //Configure the containers for the test
-    static {
-
-        Consumer<CreateContainerCmd> cmd2 = e -> e.withPortBindings(new PortBinding(Ports.Binding.bindPort(1080), new ExposedPort(1080)));
-        MOCK_SERVER_CONTAINER = new MockServerContainer()
-//                .withLogConsumer(ContainerLogger.create("mockserver"))
-                .withCreateContainerCmdModifier(cmd2);
-    }
+    private static int mockServerPort;
 
     /**
      * Starts the containers before the tests
      */
-    @BeforeAll
-    public static void init() {
-        // star the mock server container
-        MOCK_SERVER_CONTAINER.start();
-        // create mock server client to configure the responses
-        MOCK_SERVER_CLIENT = new MockServerClient(MOCK_SERVER_CONTAINER.getContainerIpAddress(), MOCK_SERVER_CONTAINER.getServerPort());
+    static {
+        RestAssured.enableLoggingOfRequestAndResponseIfValidationFails();
 
-        MOCK_SERVER_CLIENT.when(request("/v1/deployment").withMethod(HttpMethod.POST))
+        ENVIRONMENT.start();
+
+        DockerComposeService mockService = ENVIRONMENT.getService("p6-example-mockserver");
+        mockServerHost = mockService.getHost();
+        mockServerPort = mockService.getPort(1080);
+
+        createMockServerClient()
+                .when(request("/v1/deployment")
+                        .withMethod(HttpMethod.POST))
                 .respond(r -> response()
                         .withStatusCode(Response.Status.ACCEPTED.getStatusCode())
                         .withBody("{\"deploymentId\":\"1234\"}", JSON_UTF_8)
                 );
+
+        DockerComposeService service = ENVIRONMENT.getService("p6-example");
+        if (service != null) {
+            RestAssured.port = service.getPort(8080);
+        }
     }
 
-    protected MockServerClient getMockServerClient() {
-        return MOCK_SERVER_CLIENT;
+    protected static MockServerClient createMockServerClient() {
+        return new MockServerClient(mockServerHost, mockServerPort);
     }
+
 }

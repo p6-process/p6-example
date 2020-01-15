@@ -16,10 +16,8 @@
 
 package org.lorislab.p6.example.rs;
 
-import io.quarkus.test.junit.QuarkusTest;
 import org.lorislab.p6.example.test.AbstractTest;
 
-@QuarkusTest
-public class SimpleProcessRestControllerTest extends AbstractTest {
+public class SimpleProcessRestControllerTestIT extends AbstractTest {
 
 }
