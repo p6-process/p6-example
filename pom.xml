@@ -3,20 +3,77 @@
          xmlns="http://maven.apache.org/POM/4.0.0"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
 
-    <parent>
-        <groupId>org.lorislab.p6</groupId>
-        <artifactId>p6-parent</artifactId>
-        <version>1.18.0</version>
-    </parent>
-
     <modelVersion>4.0.0</modelVersion>
+    <groupId>org.lorislab.p6</groupId>
     <artifactId>p6-example</artifactId>
     <version>0.1.0-SNAPSHOT</version>
 
+    <description>P6 process engine example project</description>
+    <url>https://github.com/lorislab/p6-process/p6-example</url>
+
+    <licenses>
+        <license>
+            <name>Apache License, Version 2.0</name>
+            <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+            <distribution>repo</distribution>
+        </license>
+    </licenses>
+
+    <scm>
+        <connection>scm:git:https://github.com/p6-process/p6-example.git</connection>
+        <developerConnection>scm:git:git@github.com:p6-process/p6-example.git</developerConnection>
+        <url>https://github.com/p6-process/p6-example</url>
+    </scm>
+
+    <organization>
+        <name>lorislab</name>
+        <url>https://p6.lorislab.org</url>
+    </organization>
+
+    <developers>
+        <developer>
+            <name>Andrej Petras</name>
+            <email>andrej@lorislab.org</email>
+            <organizationUrl>https://www.lorislab.org</organizationUrl>
+        </developer>
+    </developers>
+
+    <properties>
+        <testcontainers.version>1.12.4</testcontainers.version>
+        <quarkus.version>1.2.0.Final</quarkus.version>
+        <surefire-plugin.version>2.22.1</surefire-plugin.version>
+        <maven.compiler.source>11</maven.compiler.source>
+        <maven.compiler.target>11</maven.compiler.target>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    </properties>
+
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>io.quarkus</groupId>
+                <artifactId>quarkus-bom</artifactId>
+                <version>${quarkus.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+
     <dependencies>
+        <dependency>
+            <groupId>org.lorislab.p6.quarkus</groupId>
+            <artifactId>p6-quarkus-service-task</artifactId>
+            <version>0.3.0</version>
+        </dependency>
+        <dependency>
+            <groupId>org.lorislab.p6.quarkus</groupId>
+            <artifactId>p6-quarkus-process</artifactId>
+            <version>0.3.0</version>
+        </dependency>
         <dependency>
             <groupId>org.lorislab.quarkus</groupId>
             <artifactId>jel-quarkus-log</artifactId>
+            <version>0.12.0</version>
         </dependency>
         <dependency>
             <groupId>io.quarkus</groupId>
@@ -24,7 +81,7 @@
         </dependency>
         <dependency>
             <groupId>io.quarkus</groupId>
-            <artifactId>quarkus-resteasy-jsonb</artifactId>
+            <artifactId>quarkus-resteasy-jackson</artifactId>
         </dependency>
         <dependency>
             <groupId>io.quarkus</groupId>
@@ -32,11 +89,16 @@
         </dependency>
         <dependency>
             <groupId>io.quarkus</groupId>
-            <artifactId>quarkus-rest-client</artifactId>
+            <artifactId>quarkus-smallrye-context-propagation</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>io.quarkus</groupId>
+            <artifactId>quarkus-smallrye-reactive-messaging-amqp</artifactId>
         </dependency>
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
+            <version>1.18.10</version>
             <scope>provided</scope>
         </dependency>
 
@@ -54,6 +116,25 @@
         <dependency>
             <groupId>org.lorislab.jel</groupId>
             <artifactId>jel-testcontainers</artifactId>
+            <version>0.9.0</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.awaitility</groupId>
+            <artifactId>awaitility</artifactId>
+            <version>4.0.2</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.testcontainers</groupId>
+            <artifactId>junit-jupiter</artifactId>
+            <version>${testcontainers.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.testcontainers</groupId>
+            <artifactId>testcontainers</artifactId>
+            <version>${testcontainers.version}</version>
             <scope>test</scope>
         </dependency>
     </dependencies>
@@ -62,48 +143,91 @@
         <plugins>
             <plugin>
                 <groupId>org.lorislab.maven</groupId>
-                <artifactId>mp-rest-client-maven-plugin</artifactId>
+                <artifactId>semver-release-maven-plugin</artifactId>
+                <version>0.4.0</version>
+            </plugin>
+            <plugin>
+                <groupId>io.quarkus</groupId>
+                <artifactId>quarkus-maven-plugin</artifactId>
+                <version>${quarkus.version}</version>
                 <executions>
                     <execution>
-                        <id>p6-gateway</id>
                         <goals>
-                            <goal>codegen</goal>
+                            <goal>build</goal>
                         </goals>
-                        <configuration>
-                            <inputSpec>src/main/resources/clients/p6-gateway/openapi.yaml</inputSpec>
-                            <output>${project.build.directory}/generated-sources/mprestclient</output>
-                            <generateSupportingFiles>false</generateSupportingFiles>
-                            <apiPackage>org.lorislab.p6.example.client.gateway</apiPackage>
-                            <modelPackage>org.lorislab.p6.example.client.gateway.model</modelPackage>
-                            <pathPrefix>v1/</pathPrefix>
-                            <fieldGen>PUBLIC</fieldGen>
-                            <jsonLib>JSONB</jsonLib>
-                            <apiInterfaceDoc>false</apiInterfaceDoc>
-                            <annotations>
-                                <annotation>org.eclipse.microprofile.rest.client.annotation.RegisterProvider(org.lorislab.quarkus.jel.log.interceptor.RestClientLogInterceptor.class)</annotation>
-                                <annotation>org.lorislab.quarkus.jel.log.interceptor.LoggerService</annotation>
-                                <annotation>org.eclipse.microprofile.rest.client.inject.RegisterRestClient(configKey="p6-gateway")</annotation>
-                            </annotations>
-                            <modelAnnotations>
-                                <modelAnnotation>lombok.ToString</modelAnnotation>
-                                <modelAnnotation>io.quarkus.runtime.annotations.RegisterForReflection</modelAnnotation>
-                            </modelAnnotations>
-                            <configOptions>
-                                <sourceFolder>p6-gateway</sourceFolder>
-                            </configOptions>
-                        </configuration>
                     </execution>
                 </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.8.1</version>
+                <configuration>
+                    <parameters>true</parameters>
+                </configuration>
+            </plugin>
+            <plugin>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>${surefire-plugin.version}</version>
+                <configuration>
+                    <systemProperties>
+                        <com.arjuna.ats.arjuna.objectstore.objectStoreDir>${project.build.directory}/jta
+                        </com.arjuna.ats.arjuna.objectstore.objectStoreDir>
+                        <ObjectStoreEnvironmentBean.objectStoreDir>${project.build.directory}/jta
+                        </ObjectStoreEnvironmentBean.objectStoreDir>
+                        <java.util.logging.manager>org.jboss.logmanager.LogManager</java.util.logging.manager>
+                    </systemProperties>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-failsafe-plugin</artifactId>
+                <version>${surefire-plugin.version}</version>
+                <executions>
+                    <execution>
+                        <id>native</id>
+                        <goals>
+                            <goal>integration-test</goal>
+                            <goal>verify</goal>
+                        </goals>
+                        <phase>integration-test</phase>
+                    </execution>
+                </executions>
+                <configuration>
+                    <systemPropertyVariables>
+                        <java.util.logging.SimpleFormatter.format>%1$tF %1$tH:%1$tM:%1$tS,%1$tL %4$-5s [%3$s] %5$s %n
+                        </java.util.logging.SimpleFormatter.format>
+                        <test.integration>true</test.integration>
+                    </systemPropertyVariables>
+                </configuration>
             </plugin>
         </plugins>
     </build>
 
-    <repositories>
-        <repository>
-            <id>github</id>
-            <name>GitHub p6-process Apache Maven Packages</name>
-            <url>https://maven.pkg.github.com/p6-process/p6-parent</url>
-        </repository>
-    </repositories>
+    <profiles>
+        <profile>
+            <id>native</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>io.quarkus</groupId>
+                        <artifactId>quarkus-maven-plugin</artifactId>
+                        <version>${quarkus.version}</version>
+                        <executions>
+                            <execution>
+                                <id>native</id>
+                                <goals>
+                                    <goal>native-image</goal>
+                                </goals>
+                                <configuration>
+                                    <enableHttpUrlHandler>true</enableHttpUrlHandler>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
 
 </project>

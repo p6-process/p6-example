@@ -17,10 +17,16 @@
 package org.lorislab.p6.example.test;
 
 import io.restassured.RestAssured;
+import io.restassured.builder.RequestSpecBuilder;
+import io.restassured.specification.RequestSpecification;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.lorislab.jel.testcontainers.InjectLoggerExtension;
 import org.lorislab.jel.testcontainers.docker.DockerComposeService;
 import org.lorislab.jel.testcontainers.docker.DockerTestEnvironment;
 import org.mockserver.client.MockServerClient;
+import org.slf4j.Logger;
 
+import javax.inject.Inject;
 import javax.ws.rs.HttpMethod;
 import javax.ws.rs.core.Response;
 
@@ -28,16 +34,15 @@ import static com.google.common.net.MediaType.JSON_UTF_8;
 import static org.mockserver.model.HttpRequest.request;
 import static org.mockserver.model.HttpResponse.response;
 
+@ExtendWith(InjectLoggerExtension.class)
 public abstract class AbstractTest {
 
     public static DockerTestEnvironment ENVIRONMENT = new DockerTestEnvironment();
 
-    /**
-     * The mock server client
-     */
-    private static String mockServerHost;
+    @Inject
+    protected Logger log;
 
-    private static int mockServerPort;
+    protected static RequestSpecification SPEC_PROCESS;
 
     /**
      * Starts the containers before the tests
@@ -47,26 +52,17 @@ public abstract class AbstractTest {
 
         ENVIRONMENT.start();
 
-        DockerComposeService mockService = ENVIRONMENT.getService("p6-example-mockserver");
-        mockServerHost = mockService.getHost();
-        mockServerPort = mockService.getPort(1080);
+        DockerComposeService executor = ENVIRONMENT.getService("p6-process");
 
-        createMockServerClient()
-                .when(request("/v1/deployment")
-                        .withMethod(HttpMethod.POST))
-                .respond(r -> response()
-                        .withStatusCode(Response.Status.ACCEPTED.getStatusCode())
-                        .withBody("{\"deploymentId\":\"1234\"}", JSON_UTF_8)
-                );
+        SPEC_PROCESS = new RequestSpecBuilder()
+                .setPort(executor.getPort(8080))
+                .setBaseUri("http://" + executor.getHost())
+                .build();
 
         DockerComposeService service = ENVIRONMENT.getService("p6-example");
         if (service != null) {
             RestAssured.port = service.getPort(8080);
         }
-    }
-
-    protected static MockServerClient createMockServerClient() {
-        return new MockServerClient(mockServerHost, mockServerPort);
     }
 
 }

@@ -77,10 +77,22 @@
           "service4"
         ],
         "to": [
-          "end"
+          "service5"
         ]
       },
       "sequenceFlow": "CONVERGING"
+    },
+    {
+      "nodeType": "SERVICE_TASK",
+      "name": "service5",
+      "sequence": {
+        "from": [
+          "gateway2"
+        ],
+        "to": [
+          "end"
+        ]
+      }
     },
     {
       "nodeType": "END_EVENT",

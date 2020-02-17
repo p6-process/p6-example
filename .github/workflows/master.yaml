@@ -5,10 +5,12 @@ on:
     branches:
       - master
 env:
-  SAMO_VER: 1.8.0
-  GRAALVM_VER: 19.2.1
+  SAMO_VER: 1.11.0
+  GRAALVM_VER: 19.3.1
+  GRAALVM_JAVA: java11
   GRAALVM_HOME: .graalvm
-  MAVEN_CLI_OPTS: "-s .github/.m2/settings.xml --batch-mode"
+  JAVA_HOME: .graalvm
+  MAVEN_CLI_OPTS: "-s .m2/settings.xml --batch-mode"
   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
   SAMO_DOCKER_CONFIG: ${{ secrets.DOCKER_CONFIG }}
 jobs:
@@ -18,13 +20,13 @@ jobs:
       - uses: actions/checkout@v1
       - name: Samo
         run: |
-          curl https://github.com/lorislab/samo/releases/download/v$SAMO_VER/samo_${SAMO_VER}_Linux_x86_64.tar.gz -O -J -L && tar xfz samo_${SAMO_VER}_Linux_x86_64.tar.gz samo
+          curl https://github.com/lorislab/samo/releases/download/$SAMO_VER/samo_${SAMO_VER}_Linux_x86_64.tar.gz -O -J -L && tar xfz samo_${SAMO_VER}_Linux_x86_64.tar.gz samo
           sudo mv samo /usr/local/bin/.
           rm *.tar.gz
       - name: GraalVM
         run: |
-          curl https://github.com/oracle/graal/releases/download/vm-$GRAALVM_VER/graalvm-ce-linux-amd64-$GRAALVM_VER.tar.gz -O -J -L && tar xfz graalvm-ce-linux-amd64-$GRAALVM_VER.tar.gz
-          mv graalvm-ce-$GRAALVM_VER $GRAALVM_HOME
+          curl https://github.com/graalvm/graalvm-ce-builds/releases/download/vm-$GRAALVM_VER/graalvm-ce-$GRAALVM_JAVA-linux-amd64-$GRAALVM_VER.tar.gz -O -J -L && tar xfz graalvm-ce-$GRAALVM_JAVA-linux-amd64-$GRAALVM_VER.tar.gz
+          mv graalvm-ce-$GRAALVM_JAVA-$GRAALVM_VER $GRAALVM_HOME
           $GRAALVM_HOME/bin/gu install native-image
           rm *.tar.gz
       - uses: actions/cache@v1
@@ -36,12 +38,13 @@ jobs:
       - name: Config build
         run: |
           samo docker config
-          samo maven set-hash
+          samo maven settings-add-server
+          samo maven set-build-version
       - name: Build application
         run: mvn $MAVEN_CLI_OPTS clean package -Pnative
       - name: Build docker
-        run: samo maven docker-build --verbose
+        run: samo maven docker-build
       - name: Test docker
         run: mvn $MAVEN_CLI_OPTS failsafe:integration-test
       - name: Publish docker
-        run: samo maven docker-push --verbose
+        run: samo maven docker-push
